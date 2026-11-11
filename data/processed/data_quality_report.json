@@ -1,0 +1,30 @@
+{
+  "report_type": "data_inventory_not_a_safety_ranking",
+  "zip_count": 428,
+  "available_sources": [
+    "dog_runs",
+    "dog_licenses",
+    "dog_311",
+    "dog_bites"
+  ],
+  "invalid_zip_rows": {
+    "dog_runs": 13,
+    "dog_licenses": 39,
+    "dog_bites": 15
+  },
+  "multi_zip_facility_records": 1,
+  "distinct_dog_run_facility_records": 95,
+  "limitations": [
+    "ZIP-code areas are not neighborhood boundaries and do not measure walkable access or travel distance.",
+    "Some dog-run facilities are tagged with more than one ZIP; sum over ZIPs double-counts these facilities.",
+    "License periods are not unique dogs; the license extract is 2026 while reported incidents are from 2025.",
+    "Dog-run data includes fenced facilities but does not include all permitted off-leash park areas.",
+    "The 2025 311 extract includes only the descriptor Noise, Barking Dog (NR5), not all dog-related complaints.",
+    "Complaint volume is affected by reporting behavior and may include multiple requests for one issue.",
+    "Reported bite counts can be incomplete; owner ZIP in licensing is not the same as the incident ZIP.",
+    "Counts are descriptive, not risk rates or measures of causality, safety, or best places to live.",
+    "A zero reflects no observed matching records in the snapshot, not verified absence in the real world.",
+    "Different sources have different time windows; inspect data/metadata/query_log.json."
+  ],
+  "metadata": {}
+}

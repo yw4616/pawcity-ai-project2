@@ -1,0 +1,96 @@
+objectid,name,zipcode,borough,dog_area_type,seating,surface,communityboard
+4487,Starlight Park Dog Run,"10459, 10472",X,Dog Run,,,209
+4486,Bellevue South Park Dog Run,10016,M,Dog Run,,,106
+4065,66th Street Dog Run,10069,M,Dog Run,Yes,,107
+3644,Dyckman Rest Dog Run,10040,M,Dog Run,,,112
+3227,Marcy Green South Dog Run,11211,B,Dog Run,,,301
+4485,Noonan Playground Dog Run,11104,Q,Dog Run,,,402
+318,Little Bay Park Dog Run,11360,Q,Dog Run,,,407
+308,St. Nicholas Park Dog Run,10031,M,Dog Run,,,109
+311,Tompkins Square Park Dog Run,10009,M,Dog Run,,,103
+783,Stuyvesant Square Dog Park,10003,M,Dog Run,Yes,Concrete,106
+285,Carl Schurz Park Large Dog Run,10028,M,Dog Run,,,108
+286,Carl Schurz Park Small Dog Run,10028,M,Dog Run,,,108
+782,142nd Street Dog Run,10031,M,Dog Run,Yes,Natural,109
+304,105th Street Dog Run,10024,M,Dog Run,,,107
+305,87th Street Dog Run,10024,M,Dog Run,,,107
+306,72nd Street Dog Run- Upper Level,10024,M,Dog Run,,,107
+1189,72nd Street Dog Run- Lower Level,10024,M,Dog Run,Yes,Natural,107
+300,Marcus Garvey Park Dog Run,10027,M,Dog Run,,,111
+309,Bull Moose Dog Run,10024,M,Dog Run,,,107
+299,Madison Square Park Dog Run,10010,M,Dog Run,,,105
+310,Thomas Jefferson Park Dog Run,10029,M,Dog Run,,,111
+378,Homer's Dog Run,10034,M,Dog Run,,Natural,112
+294,Highbridge Park Dog Run,10040,M,Dog Run,,,112
+293,Sir William's Dog Run,10040,M,Dog Run,,,112
+371,Rocky's Dog Run,10032,M,Dog Run,Yes,Natural,112
+370,DeWitt Clinton Park Large Dog Run,10019,M,Dog Run,,,104
+369,DeWitt Clinton Park Small Dog Run,10019,M,Dog Run,,,104
+288,Coleman Oval Park Dog Run,10002,M,Dog Run,Yes,,103
+289,Corlears Hook Park Dog Run,10002,M,Dog Run,,,103
+344,Manhattan Beach Dog Run (Oriental Boulevard),11235,B,Dog Run,,,315
+269,Hillside Park Dog Run,11201,B,Dog Run,,,302
+281,Adam Yauch Park Dog Run,11201,B,Dog Run,,,302
+265,DiMattina Park Dog Run - North,11231,B,Dog Run,,,306
+343,Dimattina Park Dog Run - South,11231,B,Dog Run,,,306
+1188,Greenwood Playground Dog Run,11218,B,Dog Run,,Natural,307
+277,McGolrick Park Dog Run,11222,B,Dog Run,,,301
+383,Washington Park Dog Run,11215,B,Dog Run,,,306
+267,Herbert Von King Park Dog Run,11216,B,Dog Run,,,303
+2797,Frank Decolvenaere Dog Run,11209,B,Dog Run,Yes,Synthetic,310
+2789,Kensington Dog Run,11226,B,Dog Run,Yes,Natural,314
+280,Owl's Head Park Dog Run,11220,B,Dog Run,,,310
+276,McCarren Park Dog Run,11211,B,Dog Run,,,301
+342,Maria Hernandez Park Dog Run,11237,B,Dog Run,Yes,,304
+341,Sternberg Park Dog Run,11206,B,Dog Run,,,301
+357,Williamsbridge Oval Dog Run,10467,X,Dog Run,,,207
+376,Kathleen Duffy Corrigan Dog Run,Null,X,Dog Run,,Natural,Null
+256,Frank S. Hackett Park Dog Run,10471,X,Dog Run,,,208
+2788,Triborough Bridge Playground C Dog Run,11102,Q,Dog Run,Yes,Asphalt,401
+2388,Bronx River Park Dog Run,10462,X,Dog Run,Yes,,227
+1993,Sirius Dog Run,,M,Dog Run,,,
+1992,West Thames Street Dog Run,,M,Dog Run,,,
+1990,Ida Court Dog Run,,R,Dog Run,,,
+1989,Pier 84 Dog Run,,M,Dog Run,,,
+1988,Tribeca Dog Park,,M,Dog Run,,,
+1589,Cooper Park Small Dog Run,,B,Dog Run,Yes,Sand,
+1588,Cooper Park Large Dog Run,,B,Dog Run,Yes,Sand,
+1187,Fox Playground Dog Run,10455,X,Dog Run,,,202
+1186,Fort Independence Playground Dog Run,,X,Dog Run,Yes,,208
+1185,Overlook Dog Park / The Barking Lot,,Q,Dog Run,,Natural,
+1184,East River Esplanade Waterfront Dog Run,,M,Dog Run,Yes,Concrete,
+1182,North End Dog Run,,M,Dog Run,Yes,,101
+784,Robin Kovary Run for Small Dogs,10011,M,Dog Run,Yes,Natural,102
+781,Soundview Park Dog Run,10473,X,Dog Run,Yes,Sand,209
+779,St. Mary's Park Dog Run,10454,X,Dog Run,No,Natural,201
+381,Pier 6 Dog Run,11201,B,Dog Run,,,"302, 306"
+380,Hunters Point South Park Dog Run,11101,Q,Dog Run,,,402
+379,Lou Lodati Dog Park,11104,Q,Dog Run,,,402
+377,Dog Bone Run,Null,X,Dog Run,,Concrete,Null
+375,Canine Court Dog Run,10471,X,Dog Run,,,226
+374,Tribeca Dog Run,10007,M,Dog Run,,,101
+340,Wolfe's Pond Park Dog Run,10312,R,Dog Run,,,503
+338,Silver Lake Park Dog Run,10301,R,Dog Run,,,501
+334,Conference House Park Dog Run,10307,R,Dog Run,,,503
+330,Bloomingdale Park Dog Run,10309,R,Dog Run,Yes,Natural,503
+326,Windmuller Park Dog Run,11377,Q,Dog Run,,,402
+325,Veteran's Grove Dog Run,11373,Q,Dog Run,,,404
+324,Underbridge Playground Dog Run,11375,Q,Dog Run,Yes,,406
+323,Sherry Park Dog Run,11377,Q,Dog Run,,,402
+322,Rockaway Freeway Dog Park,11693,Q,Dog Run,,,414
+320,Murray Playground Dog Run,11101,Q,Dog Run,,,402
+317,Forest Park Dog Run,11385,Q,Dog Run,,,482
+316,Cunningham Park Dog Run,11423,Q,Dog Run,,,408
+313,Washington Square Park Dog Run,10011,M,Dog Run,,,102
+312,Union Square Park Dog Run,10003,M,Dog Run,,,105
+307,Robert Moses Playground Dog Run,10017,M,Dog Run,,,106
+302,Peter Detmold Park Dog Run,10022,M,Dog Run,Yes,,106
+301,Morningside Park Dog Run,10026,M,Dog Run,,,109
+298,J. Hood Wright Park Dog Run,10033,M,Dog Run,,,112
+292,Fishbridge Garden Dog Run,10038,M,Dog Run,,,101
+290,Andrew Haswell Green Dog Run,10065,M,Dog Run,Yes,,108
+266,Dyker Beach Park Dog Run,11228,B,Dog Run,,,310
+260,Seton Park Dog Run,10471,X,Dog Run,,,208
+258,Pelham Bay Park Dog Run,10465,X,Dog Run,,,228
+257,Franz Sigel Park Dog Run,10451,X,Dog Run,,,204
+255,Ewen Park Dog Run,10463,X,Dog Run,,,208

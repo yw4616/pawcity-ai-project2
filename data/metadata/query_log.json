@@ -1,0 +1,78 @@
+{
+  "dog_runs": {
+    "status": "ok",
+    "dataset_name": "NYC Parks Dog Runs",
+    "dataset_id": "hxx3-bwgv",
+    "rows": 95,
+    "source_url": "https://data.cityofnewyork.us/d/hxx3-bwgv",
+    "api_query_url": "https://data.cityofnewyork.us/resource/hxx3-bwgv.json?%24select=objectid%2Cname%2Czipcode%2Cborough%2Cdog_area_type%2Cseating%2Csurface%2Ccommunityboard&%24limit=5000",
+    "event_year": null,
+    "retrieved_at_utc": "2026-11-10T22:16:29.415709+00:00",
+    "absent_columns": [],
+    "interpretation": "See data_quality_report.json"
+  },
+  "dog_licenses": {
+    "status": "ok",
+    "dataset_name": "NYC Dog Licensing Dataset",
+    "dataset_id": "nu7n-tubp",
+    "rows": 19091,
+    "source_url": "https://data.cityofnewyork.us/d/nu7n-tubp",
+    "api_query_url": "https://data.cityofnewyork.us/resource/nu7n-tubp.json?%24select=zipcode%2Cbreedname%2Ccount%28%2A%29+as+license_periods&%24where=extract_year%3D%272026%27+and+zipcode+is+not+null&%24group=zipcode%2Cbreedname&%24limit=50000",
+    "event_year": null,
+    "retrieved_at_utc": "2026-11-10T22:16:46.851688+00:00",
+    "absent_columns": [],
+    "interpretation": "License rows are periods, not necessarily unique dogs.",
+    "license_extract_year": "2026",
+    "license_years_query_url": "https://data.cityofnewyork.us/resource/nu7n-tubp.json?%24select=extract_year%2Ccount%28%2A%29+as+records&%24group=extract_year&%24order=extract_year+DESC&%24limit=100"
+  },
+  "dog_311": {
+    "status": "ok",
+    "dataset_name": "311 Service Requests 2020 to Present",
+    "dataset_id": "erm2-nwe9",
+    "rows": 180,
+    "complaint_scope": "Only descriptor = 'Noise, Barking Dog (NR5)', NOT all dog complaints",
+    "event_year": 2025,
+    "monthly_counts": {
+      "1": 673,
+      "2": 669,
+      "3": 789,
+      "4": 806,
+      "5": 867,
+      "6": 605,
+      "7": 486,
+      "8": 623,
+      "9": 691,
+      "10": 786,
+      "11": 687,
+      "12": 645
+    },
+    "api_query_urls": [
+      "https://data.cityofnewyork.us/resource/erm2-nwe9.json?%24select=incident_zip%2Ccount%28%2A%29+as+reports&%24where=created_date+%3E%3D+%272025-01-01T00%3A00%3A00%27+AND+created_date+%3C+%272025-02-01T00%3A00%3A00%27+AND+descriptor+%3D+%27Noise%2C+Barking+Dog+%28NR5%29%27+AND+incident_zip+IS+NOT+NULL&%24group=incident_zip&%24limit=1000",
+      "https://data.cityofnewyork.us/resource/erm2-nwe9.json?%24select=incident_zip%2Ccount%28%2A%29+as+reports&%24where=created_date+%3E%3D+%272025-02-01T00%3A00%3A00%27+AND+created_date+%3C+%272025-03-01T00%3A00%3A00%27+AND+descriptor+%3D+%27Noise%2C+Barking+Dog+%28NR5%29%27+AND+incident_zip+IS+NOT+NULL&%24group=incident_zip&%24limit=1000",
+      "https://data.cityofnewyork.us/resource/erm2-nwe9.json?%24select=incident_zip%2Ccount%28%2A%29+as+reports&%24where=created_date+%3E%3D+%272025-03-01T00%3A00%3A00%27+AND+created_date+%3C+%272025-04-01T00%3A00%3A00%27+AND+descriptor+%3D+%27Noise%2C+Barking+Dog+%28NR5%29%27+AND+incident_zip+IS+NOT+NULL&%24group=incident_zip&%24limit=1000",
+      "https://data.cityofnewyork.us/resource/erm2-nwe9.json?%24select=incident_zip%2Ccount%28%2A%29+as+reports&%24where=created_date+%3E%3D+%272025-04-01T00%3A00%3A00%27+AND+created_date+%3C+%272025-05-01T00%3A00%3A00%27+AND+descriptor+%3D+%27Noise%2C+Barking+Dog+%28NR5%29%27+AND+incident_zip+IS+NOT+NULL&%24group=incident_zip&%24limit=1000",
+      "https://data.cityofnewyork.us/resource/erm2-nwe9.json?%24select=incident_zip%2Ccount%28%2A%29+as+reports&%24where=created_date+%3E%3D+%272025-05-01T00%3A00%3A00%27+AND+created_date+%3C+%272025-06-01T00%3A00%3A00%27+AND+descriptor+%3D+%27Noise%2C+Barking+Dog+%28NR5%29%27+AND+incident_zip+IS+NOT+NULL&%24group=incident_zip&%24limit=1000",
+      "https://data.cityofnewyork.us/resource/erm2-nwe9.json?%24select=incident_zip%2Ccount%28%2A%29+as+reports&%24where=created_date+%3E%3D+%272025-06-01T00%3A00%3A00%27+AND+created_date+%3C+%272025-07-01T00%3A00%3A00%27+AND+descriptor+%3D+%27Noise%2C+Barking+Dog+%28NR5%29%27+AND+incident_zip+IS+NOT+NULL&%24group=incident_zip&%24limit=1000",
+      "https://data.cityofnewyork.us/resource/erm2-nwe9.json?%24select=incident_zip%2Ccount%28%2A%29+as+reports&%24where=created_date+%3E%3D+%272025-07-01T00%3A00%3A00%27+AND+created_date+%3C+%272025-08-01T00%3A00%3A00%27+AND+descriptor+%3D+%27Noise%2C+Barking+Dog+%28NR5%29%27+AND+incident_zip+IS+NOT+NULL&%24group=incident_zip&%24limit=1000",
+      "https://data.cityofnewyork.us/resource/erm2-nwe9.json?%24select=incident_zip%2Ccount%28%2A%29+as+reports&%24where=created_date+%3E%3D+%272025-08-01T00%3A00%3A00%27+AND+created_date+%3C+%272025-09-01T00%3A00%3A00%27+AND+descriptor+%3D+%27Noise%2C+Barking+Dog+%28NR5%29%27+AND+incident_zip+IS+NOT+NULL&%24group=incident_zip&%24limit=1000",
+      "https://data.cityofnewyork.us/resource/erm2-nwe9.json?%24select=incident_zip%2Ccount%28%2A%29+as+reports&%24where=created_date+%3E%3D+%272025-09-01T00%3A00%3A00%27+AND+created_date+%3C+%272025-10-01T00%3A00%3A00%27+AND+descriptor+%3D+%27Noise%2C+Barking+Dog+%28NR5%29%27+AND+incident_zip+IS+NOT+NULL&%24group=incident_zip&%24limit=1000",
+      "https://data.cityofnewyork.us/resource/erm2-nwe9.json?%24select=incident_zip%2Ccount%28%2A%29+as+reports&%24where=created_date+%3E%3D+%272025-10-01T00%3A00%3A00%27+AND+created_date+%3C+%272025-11-01T00%3A00%3A00%27+AND+descriptor+%3D+%27Noise%2C+Barking+Dog+%28NR5%29%27+AND+incident_zip+IS+NOT+NULL&%24group=incident_zip&%24limit=1000",
+      "https://data.cityofnewyork.us/resource/erm2-nwe9.json?%24select=incident_zip%2Ccount%28%2A%29+as+reports&%24where=created_date+%3E%3D+%272025-11-01T00%3A00%3A00%27+AND+created_date+%3C+%272025-12-01T00%3A00%3A00%27+AND+descriptor+%3D+%27Noise%2C+Barking+Dog+%28NR5%29%27+AND+incident_zip+IS+NOT+NULL&%24group=incident_zip&%24limit=1000",
+      "https://data.cityofnewyork.us/resource/erm2-nwe9.json?%24select=incident_zip%2Ccount%28%2A%29+as+reports&%24where=created_date+%3E%3D+%272025-12-01T00%3A00%3A00%27+AND+created_date+%3C+%272026-01-01T00%3A00%3A00%27+AND+descriptor+%3D+%27Noise%2C+Barking+Dog+%28NR5%29%27+AND+incident_zip+IS+NOT+NULL&%24group=incident_zip&%24limit=1000"
+    ],
+    "retrieved_at_utc": "2026-11-10T22:42:37.119221+00:00",
+    "source_url": "https://data.cityofnewyork.us/d/erm2-nwe9"
+  },
+  "dog_bites": {
+    "status": "ok",
+    "dataset_name": "DOHMH Dog Bite Data",
+    "dataset_id": "rsgh-akpg",
+    "rows": 241,
+    "source_url": "https://data.cityofnewyork.us/d/rsgh-akpg",
+    "api_query_url": "https://data.cityofnewyork.us/resource/rsgh-akpg.json?%24select=zipcode%2Ccount%28%2A%29+as+bite_reports&%24where=dateofbite+%3E%3D+%272025-01-01T00%3A00%3A00%27+and+dateofbite+%3C+%272026-01-01T00%3A00%3A00%27+and+zipcode+is+not+null&%24group=zipcode&%24limit=50000",
+    "event_year": 2025,
+    "retrieved_at_utc": "2026-11-10T22:20:38.350514+00:00",
+    "absent_columns": [],
+    "interpretation": "See data_quality_report.json"
+  }
+}

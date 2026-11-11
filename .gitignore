@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+.env.*
+.DS_Store
+.ipynb_checkpoints/
+.pytest_cache/
+*.log
+# The shipped data are aggregated/facility-level snapshots, not owner-level records.
+# Never commit personal dog-license records, tokens, or secrets.

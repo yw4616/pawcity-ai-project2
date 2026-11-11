@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PawCity AI — Research where dogs thrive</title>
+<style>
+:root{color-scheme:light;font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--ink:#172d29;--muted:#657973;--green:#153e35;--line:#dfe8e2;--bg:#f5f7f3}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink)}
+header{padding:19px 5vw;background:#fff;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
+.logo{font-weight:850;letter-spacing:-.5px;font-size:22px}.logo b{color:#2e8165}.topnote{font-size:12px;color:#58746a;padding:8px 11px;background:#edf6f0;border-radius:100px}
+.hero{background:radial-gradient(ellipse at 85% 20%,#367d5c 0%,transparent 42%),linear-gradient(112deg,#143e35 5%,#235747 100%);color:#fff;padding:65px 5vw 76px}
+.hero-inner{max-width:1150px;margin:auto}.eyebrow{font-size:11px;letter-spacing:2.4px;text-transform:uppercase;color:#a7e4c7;font-weight:800}
+h1{font-size:clamp(40px,5.8vw,74px);line-height:1.06;max-width:750px;letter-spacing:-2.7px;margin:17px 0 19px}.hero p{max-width:720px;color:#d6e8dd;font-size:17px;line-height:1.7;margin-bottom:22px}
+.hero-tags{display:flex;flex-wrap:wrap;gap:9px}.tag{font-size:12px;border:1px solid #89b6a0;color:#e6fff0;padding:7px 12px;border-radius:25px}
+main{max-width:1200px;padding:0 24px 85px;margin:-33px auto 0;position:relative}.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:26px;margin-bottom:19px;box-shadow:0 8px 25px #133e2a09}
+h2{font-size:24px;letter-spacing:-.65px;margin:0 0 7px}.sub{color:var(--muted);line-height:1.7;font-size:14px;margin:3px 0 19px}
+.label{font-weight:750;font-size:13px;margin:13px 0 8px;display:block}
+textarea{width:100%;min-height:95px;border:1px solid #bbcec3;border-radius:12px;font:inherit;font-size:14px;padding:14px;resize:vertical;line-height:1.6;background:#fcfdfc}
+textarea:focus{outline:3px solid #bce4cf;border-color:#268362}
+.action{display:flex;align-items:center;gap:12px;justify-content:space-between;margin:14px 0 9px;flex-wrap:wrap}
+button{border:0;background:#166648;color:white;padding:12px 17px;border-radius:10px;font-size:14px;font-weight:750;cursor:pointer}
+button:hover{background:#0b4732}button:disabled{opacity:.55;cursor:progress}.secondary{background:#e9f4ed;color:#1c6245;padding:8px 11px;font-size:12px;text-align:left}
+.secondary:hover{background:#d9ecdd}.examples{display:flex;gap:9px;flex-wrap:wrap}
+small,.small{font-size:12px;color:var(--muted);line-height:1.6}.notice{padding:11px 13px;background:#f2f6ec;color:#456445;border-radius:11px;margin-top:12px;font-size:12px;line-height:1.6}
+.status{font-size:13px;color:#426a55}.result{display:none}.result.visible{display:block}.answer{white-space:pre-wrap;line-height:1.75;font-size:14px;color:#293a35;margin:12px 0}
+.sources{display:flex;gap:8px;flex-wrap:wrap}.sources a{padding:8px 10px;background:#edf5ee;color:#285c45;font-size:12px;font-weight:700;text-decoration:none;border-radius:10px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.stat{padding:20px;border:1px solid var(--line);border-radius:14px;background:#fff}.stat strong{display:block;font-size:32px;letter-spacing:-1.5px}.stat span{font-size:12px;color:var(--muted)}
+.layout{display:grid;grid-template-columns:1.3fr .7fr;gap:19px;margin-top:19px}.table-wrap{overflow:auto;max-height:380px}
+table{border-collapse:collapse;width:100%;font-size:13px}th{text-align:left;font-size:11px;letter-spacing:.3px;color:#608074;background:#f7faf6;position:sticky;top:0}td,th{border-bottom:1px solid #e8ede9;padding:10px 9px;white-space:nowrap}td:first-child{font-weight:760}
+.bar{height:7px;background:#e8f0e9;border-radius:6px;overflow:hidden;margin-top:4px}.bar>span{height:100%;display:block;background:#46a47a;border-radius:6px}
+details{padding:12px 0;border-bottom:1px solid var(--line)}summary{cursor:pointer;font-weight:700;font-size:13px;color:#274e3a}pre{overflow:auto;white-space:pre-wrap;word-break:break-word;background:#f5f8f5;padding:13px;border-radius:11px;font-size:11px;max-height:290px;color:#39584b}
+.workflow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:18px 0}.step{border:1px solid #cae1d0;padding:10px 15px;border-radius:13px;background:#f7fbf6;font-size:12px;font-weight:750}.arrow{color:#6a8e78}
+footer{padding:18px;text-align:center;color:#77867d;font-size:12px}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}h1{letter-spacing:-1.6px}main{padding:0 13px 45px}.hero{padding:42px 20px 65px}.panel{padding:19px}}
+</style>
+</head>
+<body>
+<header><div class="logo">🐾 PawCity <b>AI</b></div><span class="topnote">NYC OPEN-DATA RESEARCH</span></header>
+<section class="hero"><div class="hero-inner"><div class="eyebrow">EVIDENCE BEFORE OPINION</div><h1>Better questions. Better places for dogs.</h1><p>Explore the real data behind NYC dog-friendly living: fenced dog runs, licensing records, barking-noise requests, and reported bite incidents. Get a research report with traceable sources, not an invented safety score.</p><div class="hero-tags"><span class="tag">Lead Agent</span><span class="tag">Parallel Researchers</span><span class="tag">Writer Agent</span><span class="tag">Bounded follow-up research</span></div></div></section>
+<main>
+<section class="panel"><h2>Ask a neighborhood research question</h2><p class="sub">For dog owners, urban planners, researchers, and people comparing NYC ZIP-code areas. Specific five-digit ZIP codes help make comparisons fair and reproducible.</p>
+<label class="label" for="question">Your research question</label><textarea id="question">Compare ZIP 10001 and ZIP 10002 using dog runs, license periods, 2025 barking complaints and bite reports.</textarea>
+<div class="action"><button id="ask">Research with PawCity <span aria-hidden="true">↗</span></button><span id="status" class="status">Checking the research service…</span></div>
+<div class="examples" id="examples"></div>
+<div class="notice"><strong>Interpretation matters:</strong> A license period is not a unique dog. A complaint is not a confirmed violation. A reported bite count is not a bite-risk rate. A ZIP code is not a neighborhood boundary.</div></section>
+<section id="result" class="panel result" aria-live="polite"><h2>Research report</h2><div class="answer" id="answer"></div><h3>Evidence and citations</h3><div class="sources" id="citations"></div><details><summary>Show work: sub-agent tool calls</summary><div id="trace"></div></details><details><summary>Agent planning and follow-up trace</summary><pre id="agent-trace"></pre></details></section>
+<div class="grid" id="stats"><div class="stat"><strong id="facility-count">—</strong><span>Distinct dog-run facilities in snapshot</span></div><div class="stat"><strong id="zip-count">—</strong><span>ZIP strings across all sources*</span></div><div class="stat"><strong id="barking-count">—</strong><span>2025 barking-noise requests</span></div><div class="stat"><strong id="source-count">—</strong><span>Verified source extracts</span></div></div>
+<div class="layout">
+<section class="panel"><h2>Explore ZIP-level evidence</h2><p class="sub">This table juxtaposes recorded counts. It does not rank neighborhood safety. ZIPs with large license-period counts are shown for demonstration.</p><div class="table-wrap"><table><thead><tr><th>ZIP</th><th>Dog runs</th><th>License periods*</th><th>Barking (2025)</th><th>Bite reports (2025)</th></tr></thead><tbody id="rows"><tr><td colspan="5">Loading snapshot…</td></tr></tbody></table></div></section>
+<section class="panel"><h2>Research workflow</h2><p class="sub">The Lead plans what to investigate, specialists query local source files concurrently in fresh contexts, and the Writer synthesizes cited evidence. The Lead can request another round if a gap remains.</p><div class="workflow"><span class="step">Lead</span><span class="arrow">→</span><span class="step">3 parallel Researchers</span><span class="arrow">→</span><span class="step">Gap review</span><span class="arrow">→</span><span class="step">Writer</span></div><h3>Source snapshots</h3><div class="sources"><a target="_blank" rel="noopener" href="https://data.cityofnewyork.us/d/hxx3-bwgv">NYC Dog Runs</a><a target="_blank" rel="noopener" href="https://data.cityofnewyork.us/d/nu7n-tubp">NYC Dog Licensing</a><a target="_blank" rel="noopener" href="https://data.cityofnewyork.us/d/erm2-nwe9">NYC 311</a><a target="_blank" rel="noopener" href="https://data.cityofnewyork.us/d/rsgh-akpg">NYC Dog Bites</a></div><p class="small">* ZIP strings include some out-of-city owner ZIPs in the licensing extract. Results are scoped to conservative NYC ZIP patterns for exploratory citywide questions. License periods are not dog counts.</p></section>
+</div>
+</main><footer>© PawCity AI · IEOR 4570 Project 2 · An educational research tool, not a safety certification.</footer>
+<script>
+const $=id=>document.getElementById(id);
+const fmt=n=>Number(n).toLocaleString('en-US');
+function addText(parent,tag,text){const el=document.createElement(tag);el.textContent=text;parent.appendChild(el);return el;}
+async function load(){
+ try{
+  const response=await fetch('/api/summary');if(!response.ok)throw Error('Snapshot could not be loaded');
+  const payload=await response.json();const rows=payload.rows||[];const log=payload.sources||{};
+  $('facility-count').textContent=log.dog_runs?.rows??'—';
+  $('zip-count').textContent=fmt(rows.length);
+  $('barking-count').textContent=fmt(rows.reduce((s,r)=>s+(Number(r.dog_related_311)||0),0));
+  $('source-count').textContent=Object.values(log).filter(s=>s.status==='ok').length+' / 4';
+  $('status').textContent=payload.model_configured?'Model connected · ready to research':'Model not configured · data explorer is available';
+  const top=rows.filter(r=>Number(r.license_periods)>0 && /^(100|101|102|103|104|111|112|113|114|116)/.test(r.zip_code))
+   .sort((a,b)=>Number(b.license_periods)-Number(a.license_periods)).slice(0,16);
+  const body=$('rows');body.replaceChildren();
+  for(const item of top){const tr=document.createElement('tr');for(const key of ['zip_code','dog_runs','license_periods','dog_related_311','reported_bites'])addText(tr,'td',item[key]??'—');body.appendChild(tr);}
+ }catch(error){$('status').textContent=error.message;}
+ const queries=await fetch('/api/sample-questions').then(r=>r.json()).catch(()=>({questions:[]}));
+ for(const question of queries.questions||[]){const b=document.createElement('button');b.className='secondary';b.textContent=question;b.addEventListener('click',()=>{$('question').value=question;$('question').focus()});$('examples').appendChild(b);}
+}
+let sessionId = null;
+$('ask').addEventListener('click',async()=>{
+ const question=$('question').value.trim();if(!question)return;
+ $('ask').disabled=true;$('status').textContent='Planning research and querying the evidence…';$('result').classList.remove('visible');
+ try{
+  const response=await fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:question, ...(sessionId ? {session_id:sessionId} : {})})});
+  const data=await response.json();if(!response.ok)throw Error(data.error||'Research request failed');
+  sessionId = data.session_id || sessionId;
+  $('answer').textContent=data.response||data.answer||'';
+  $('citations').replaceChildren();for(const cite of data.citations||[]){const a=document.createElement('a');a.href=cite.url;a.target='_blank';a.rel='noopener';a.textContent=`[${cite.id}] ${cite.title}`;$('citations').appendChild(a);}
+  $('trace').replaceChildren();for(const call of data.tool_calls||[]){const detail=document.createElement('details');addText(detail,'summary',`${call.agent} · ${call.name} · Round ${call.round}`);addText(detail,'pre',JSON.stringify({args:call.args??call.arguments,result:call.result},null,2));$('trace').appendChild(detail);}
+  $('agent-trace').textContent=JSON.stringify(data.agent_trace||[],null,2);
+  $('result').classList.add('visible');$('result').scrollIntoView({behavior:'smooth',block:'start'});
+  $('status').textContent=data.clarification_needed?'Clarification required':'Research completed with source citations';
+ }catch(err){$('status').textContent=err.message;}finally{$('ask').disabled=false;}
+});load();
+</script>
+</body>
+</html>
