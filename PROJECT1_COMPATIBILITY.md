@@ -44,7 +44,7 @@ Example response (illustrative structure, **not** a generated research result):
 ## Behavioral differences from Project 1
 
 - **GradPath** persists message history and explicitly stated programs in in-memory dictionaries and exposes `POST /clear`. **PawCity** currently echoes or generates session IDs, but its research queries are stateless; it does **not** implement cross-turn conversational memory or GradPath's `/clear` endpoint. These behaviors are not part of the stated Project 2 `/chat` *response-shape* requirement, and should not be presented as implemented.
-- **GradPath** runs a Gemini tool-calling loop on LiteLLM. **PawCity** uses OpenAI's Responses API to coordinate a Lead, fresh-context parallel Researchers, a gap review, and a Writer; model/provider parity was not required by the assignment.
+- **GradPath** calls Vertex AI Gemini via LiteLLM. **PawCity** now calls Vertex AI Gemini via Google Cloud-authenticated REST requests, while preserving its Lead, independent parallel Researchers, gap review, and Writer. Both use Google Cloud; the internal orchestration still differs.
 - Source citation links and sub-agent tool traces appear in separate additional fields as well as the natural-language `response`.
 
 ## Testing
@@ -53,4 +53,4 @@ Run `python -m unittest discover -s tests -v`. The offline HTTP tests assert tha
 
 ## Preserve the local comparison checkpoint
 
-Previously recorded genuine model responses on the user's computer are stored in `reports/sample_comparisons.json` and are **not** automatically present in this updated ZIP. If such a file exists locally, copy the actual saved `reports/` folder into the consolidated project before running further comparisons. Never invent absent model responses.
+Previously recorded genuine model responses on the user's computer are stored in `reports/sample_comparisons.json` and are **not** automatically present in this updated ZIP. If that file contains GPT results, archive it outside the active `reports/sample_comparisons.json` path; run the three actual Gemini baselines and agents before submitting the README. Never relabel GPT results as Gemini results.

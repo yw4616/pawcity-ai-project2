@@ -1,7 +1,7 @@
 """PawCity HTTP server: data explorer + LLM-backed /chat endpoint.
 
 Use python app.py locally or run as the Cloud Run container entrypoint.
-The API key is provided through the OPENAI_API_KEY environment variable.
+The Google Cloud project and ADC provide Vertex AI Gemini access; no API key is used.
 """
 from __future__ import annotations
 
@@ -36,12 +36,12 @@ class Handler(BaseHTTPRequestHandler):
             return
         rows, quality, provenance = snapshot()
         if route == "/health":
-            self._json(200, {"ok": True, "project": "pawcity-ai", "model_configured": bool(os.getenv("OPENAI_API_KEY")),
+            self._json(200, {"ok": True, "project": "pawcity-ai", "model_provider": "vertex_ai", "model_configured": bool(os.getenv("GOOGLE_CLOUD_PROJECT")),
                              "data_sources_ok": sum(s.get("status") == "ok" for s in provenance.values()),
                              "phase": "deep_research"})
         elif route == "/api/summary":
             self._json(200, {"rows": rows, "quality": quality, "sources": provenance,
-                             "model_configured": bool(os.getenv("OPENAI_API_KEY"))})
+                             "model_configured": bool(os.getenv("GOOGLE_CLOUD_PROJECT"))})
         elif route == "/api/quality":
             self._json(200, quality)
         elif route == "/api/provenance":
@@ -76,8 +76,8 @@ class Handler(BaseHTTPRequestHandler):
                                                      not 0 < len(supplied_session_id.strip()) <= 128):
                 raise ValueError("session_id must be a nonempty string of at most 128 characters")
             session_id = supplied_session_id or str(uuid.uuid4())
-            if not os.getenv("OPENAI_API_KEY"):
-                error = "Live research is not configured: set OPENAI_API_KEY as an environment secret."
+            if not os.getenv("GOOGLE_CLOUD_PROJECT"):
+                error = "Live research is not configured: set GOOGLE_CLOUD_PROJECT and grant the runtime service account Vertex AI access."
                 self._json(503, {"error": error, "response": error, "session_id": session_id,
                                  "tool_calls": [], "citations": []})
                 return
@@ -119,5 +119,5 @@ class Handler(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", "8080"))
-    print(f"PawCity AI is serving on http://127.0.0.1:{port} (live model configured: {bool(os.getenv('OPENAI_API_KEY'))})", flush=True)
+    print(f"PawCity AI is serving on http://127.0.0.1:{port} (live model configured: {bool(os.getenv('GOOGLE_CLOUD_PROJECT'))})", flush=True)
     ThreadingHTTPServer(("0.0.0.0", port), Handler).serve_forever()

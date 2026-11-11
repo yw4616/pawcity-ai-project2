@@ -62,7 +62,7 @@ async function load(){
   $('zip-count').textContent=fmt(rows.length);
   $('barking-count').textContent=fmt(rows.reduce((s,r)=>s+(Number(r.dog_related_311)||0),0));
   $('source-count').textContent=Object.values(log).filter(s=>s.status==='ok').length+' / 4';
-  $('status').textContent=payload.model_configured?'Model connected · ready to research':'Model not configured · data explorer is available';
+  $('status').textContent=payload.model_configured?'GCP project set · live model access requires IAM':'GCP project not set · data explorer is available';
   const top=rows.filter(r=>Number(r.license_periods)>0 && /^(100|101|102|103|104|111|112|113|114|116)/.test(r.zip_code))
    .sort((a,b)=>Number(b.license_periods)-Number(a.license_periods)).slice(0,16);
   const body=$('rows');body.replaceChildren();

@@ -47,7 +47,7 @@ class TestHTTPAPI(unittest.TestCase):
         self.assertEqual(status,200)
         self.assertIn('data_sources_ok',result)
 
-    def test_chat_reports_missing_key(self):
+    def test_chat_reports_missing_project(self):
         with patch.dict(os.environ,{},clear=True):
             with self.assertRaises(HTTPError) as context:
                 self.request('/chat',{'message':'Compare ZIP 10001 and ZIP 10002'})
@@ -58,7 +58,7 @@ class TestHTTPAPI(unittest.TestCase):
             self.assertEqual(payload['tool_calls'], [])
 
     def test_chat_response_has_agent_tool_calls(self):
-        with patch.dict(os.environ,{'OPENAI_API_KEY':'offline-mock-only'}):
+        with patch.dict(os.environ,{'GOOGLE_CLOUD_PROJECT':'offline-test-project'}):
             with patch('app.PawCityResearch') as research:
                 research.return_value.run.return_value=MockReport()
                 status,data=self.request('/chat',{'message':'Compare ZIP 10001 and ZIP 10002'})
@@ -73,7 +73,7 @@ class TestHTTPAPI(unittest.TestCase):
 
     def test_project1_final_response_contract(self):
         # The final GradPath app(5).py defines these three required properties.
-        with patch.dict(os.environ, {'OPENAI_API_KEY': 'offline-mock-only'}):
+        with patch.dict(os.environ, {'GOOGLE_CLOUD_PROJECT': 'offline-test-project'}):
             with patch('app.PawCityResearch') as research:
                 research.return_value.run.return_value = MockReport()
                 status, data = self.request('/chat', {'message': 'Compare ZIP 10001 with ZIP 10002'})
@@ -84,7 +84,7 @@ class TestHTTPAPI(unittest.TestCase):
         self.assertTrue(all({'name', 'args', 'result', 'agent'} <= set(call) for call in data['tool_calls']))
 
     def test_chat_echoes_provided_session_id(self):
-        with patch.dict(os.environ, {'OPENAI_API_KEY': 'offline-mock-only'}):
+        with patch.dict(os.environ, {'GOOGLE_CLOUD_PROJECT': 'offline-test-project'}):
             with patch('app.PawCityResearch') as research:
                 research.return_value.run.return_value = MockReport()
                 status, data = self.request('/chat', {

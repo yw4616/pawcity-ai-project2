@@ -17,7 +17,7 @@ A user enters a question in the custom homepage or sends JSON to `POST /chat`. T
 
 PawCity accepts `POST /chat` requests with `{ "message": "...", "session_id": "optional" }`, matching the Project 1 `ChatRequest` fields. Responses retain the Project 1 required keys `response`, `session_id`, and `tool_calls`. New session IDs are UUID strings; if the client provides a session ID, the service echoes it back. This ID is used for request/response compatibility, **not as a durable session-memory store**.
 
-Each Researcher tool call includes the original `name`, `args`, and `result` fields plus the required `agent` identifier and a research `round`; `arguments` remains available as a compatibility alias for existing frontend code. Extra fields `citations`, `agent_trace`, `answer`, and `clarification_needed` power the PawCity evidence UI. Lead and Writer actions are recorded in `agent_trace` rather than falsely represented as data-tool calls. The live service may respond with a 503 error when its model key or rate limit prevents research.
+Each Researcher tool call includes the original `name`, `args`, and `result` fields plus the required `agent` identifier and a research `round`; `arguments` remains available as a compatibility alias for existing frontend code. Extra fields `citations`, `agent_trace`, `answer`, and `clarification_needed` power the PawCity evidence UI. Lead and Writer actions are recorded in `agent_trace` rather than falsely represented as data-tool calls. The live service may respond with 503 when Google Cloud authentication, Vertex AI permissions, or quota prevents research.
 
 Example response envelope (illustrative, not a live answer):
 
@@ -88,7 +88,7 @@ For detailed field descriptions, interpretation limits, and extraction methods, 
 
 ## 3. Local setup (Jupyter-friendly)
 
-Requirements: **Python 3.11+**, optional `uv`, and an optional OpenAI API key for genuine LLM research. The server and data processing use Python standard library only; no additional pip package is required.
+Requirements: **Python 3.11+**, optionally `uv`, and **Google Cloud CLI with Application Default Credentials** for local live Gemini calls. The code uses the Python standard library and Vertex AI REST API; no additional Python package is required. Google Cloud API usage is billed to the selected project (eligible school credits may apply).
 
 ```bash
 uv sync
@@ -103,7 +103,18 @@ python -m unittest discover -s tests -v
 python app.py
 ```
 
-Visit **http://localhost:8080**. Read-only data exploration works without a key. The **live AI research** endpoint requires `OPENAI_API_KEY` securely configured in the server's environment. Do not put API keys in source files, commit histories, screenshots or notebooks. Model defaults to `gpt-4.1-mini`; change with `PAWCITY_MODEL`. The cost of actual model calls depends on your API account.
+For live local research, first enable Vertex AI API on your school Google Cloud project and run:
+
+```bash
+gcloud auth application-default login
+gcloud auth application-default set-quota-project YOUR_SCHOOL_GCP_PROJECT_ID
+export GOOGLE_CLOUD_PROJECT="YOUR_SCHOOL_GCP_PROJECT_ID"
+export GOOGLE_CLOUD_LOCATION="global"
+export PAWCITY_MODEL="gemini-3.5-flash-lite"
+python app.py
+```
+
+Replace `YOUR_SCHOOL_GCP_PROJECT_ID` with the **GCP project ID**, not an OpenAI project ID and not the project display name. See [`GEMINI_SETUP.md`](GEMINI_SETUP.md). Visit **http://localhost:8080**. Read-only data exploration also works without Cloud credentials; live research requires ADC and the `roles/aiplatform.user` IAM role. **Do not commit access tokens, API keys, or service account JSON keys.**
 
 Open **`PawCity_Complete.ipynb`** in JupyterLab for a completely English notebook covering source verification, offline tests, evidence queries and an optional live model test. If you run the server from inside Jupyter, use a separate terminal or start it using `subprocess` instead of keeping a cell blocked on `serve_forever()`.
 
@@ -143,7 +154,7 @@ Expected values below were computed from the included real CSV snapshots. For ea
 
 ### Side-by-side comparison against the same model with no tools or system prompt
 
-`uv run python scripts/compare_samples.py` calls the same OpenAI model twice for each question: (1) with only the bare question, **without tools or a system prompt**, and (2) through the full multi-agent pipeline. It checkpoints baseline responses immediately and full agent responses after each question in `reports/sample_comparisons.json`, so rerunning after an API rate limit resumes without repeating completed calls. Once all questions finish, it updates the block below. API calls are paced across parallel researchers using `PAWCITY_API_RPM` (default 7 requests/minute; adjust for your account limit). **This command requires a real API key. No model answers have been invented for this README.**
+`uv run python scripts/compare_samples.py` calls the same Vertex AI Gemini model twice for each question: (1) with only the bare question, **without tools or a system prompt**, and (2) through the full multi-agent pipeline. It checkpoints baseline responses immediately and full agent responses after each question in `reports/sample_comparisons.json`, so rerunning after an API rate limit resumes without repeating completed calls. Once all questions finish, it updates the block below. Calls are paced across parallel researchers using `PAWCITY_API_RPM` (default 7 requests/minute; adjust for Google Cloud quotas). **This command requires a real Google Cloud identity and Vertex AI access. No model answers have been invented for this README.**
 
 <!-- COMPARISON_RESULTS_START -->
 | Question | Same model, no tools or system prompt | Tool-enabled PawCity agent |
@@ -164,13 +175,13 @@ The app includes an original custom frontend (research question composer, sugges
 ## 6. Deployment to Google Cloud Run
 
 1. Create a GitHub repository with the **contents of this directory at the repository root**. Keep the included grouped CSV files; all are well below GitHub's 100 MB limit.
-2. Test locally with `python app.py`. Docker (optional): `docker build -t pawcity-ai .` then `docker run --rm -p 8080:8080 -e OPENAI_API_KEY="$OPENAI_API_KEY" pawcity-ai`.
-3. In Google Cloud Console select **Cloud Run → Create Service → Continuous deployment from repository**; connect the GitHub repo and select the Dockerfile build. Choose the correct Google Cloud project and region. Configure `OPENAI_API_KEY` via **Secret Manager**, not a committed `.env` file. Set the request timeout high enough for the agent (for example, **300 seconds**) and define `PAWCITY_MAX_TURNS=2`.
+2. Test locally with `python app.py` after setting the GCP project and running `gcloud auth application-default login`. Docker is intended for Cloud Run; local Docker is read-only unless a compatible Google Cloud identity is explicitly attached.
+3. In Google Cloud Console select **Cloud Run → Create Service → Continuous deployment from repository**; connect GitHub and select Dockerfile build. Use the course GCP project, set environment variables `GOOGLE_CLOUD_PROJECT`, `GOOGLE_CLOUD_LOCATION=global`, `PAWCITY_MODEL=gemini-3.5-flash-lite`, and `PAWCITY_MAX_TURNS=2`. Give the **Cloud Run runtime service account** `roles/aiplatform.user` on the project. Enable Vertex AI API. No OpenAI Secret Manager credential is needed for Gemini. Set request timeout to **300 seconds** and consider Cloud Run max instances/concurrency for Vertex AI quota.
 4. Follow the instructor’s Cloud Run deployment guide: when deploying under the Columbia GCP organization, configure **Require authentication → Identity-Aware Proxy (IAP)** and the specified Columbia access policy, then verify that graders can log in and access `/health` and `/chat`. Do not expose an unrestricted public service contrary to the course guide. Keep the service available until grades are released.
 5. Update `submission.json` with the actual URL and **every team member's UNI** (the only UNI known from the conversation is `yw4616`), then run `python validate_submission.py`. One teammate submits the GitHub URL to Courseworks.
 6. If using a private repo, grant access to the four GitHub usernames specified in the assignment.
 
-**Cloud Run and GitHub have not been provisioned in this archive.** The blank deployment URL in `submission.json` must be replaced before submission. Secret configuration, API billing, publicly reachable site verification and the final GitHub submission require account access.
+**This archive does not claim a live Google Cloud deployment.** Replace the blank URL in `submission.json` only after the actual Cloud Run service works. School credits and live model access must be verified in your own GCP project.
 
 ## 7. Rubric readiness (25 points)
 
@@ -184,7 +195,7 @@ The app includes an original custom frontend (research question composer, sugges
 
 ### Final submission checklist
 
-- [ ] Run a **real** API-enabled research session and inspect source citations/tool traces.
+- [ ] Run a **real** Vertex AI Gemini research session and inspect source citations/tool traces.
 - [ ] Run `scripts/compare_samples.py` to populate the exact same-model comparisons above.
 - [x] Inspect the actual final GradPath Project 1 `app(5).py` and verify the `/chat` response envelope; sub-agent calls include `agent`.
 - [ ] Verify all team members and one or more data sources per member.
@@ -194,4 +205,4 @@ The app includes an original custom frontend (research question composer, sugges
 
 ## 8. Rate-limit-safe comparison reruns
 
-If the project must run with a model quota of 10 requests per minute, open `PawCity_Resume_Comparisons.ipynb` and run its cells in order. A shared, process-local request pacer defaults to 7 requests per minute; HTTP 429 rate-limit responses are retried with backoff. The comparison script saves each baseline immediately and each full agent report as soon as it completes. Rerunning after an interruption reuses those checkpoints. Responses from runs made with the older, non-checkpointing script cannot be recovered unless previously saved elsewhere. No results in this repository are fabricated.
+If the project uses a low model request quota, open `PawCity_Resume_Comparisons.ipynb` and run its cells in order. A shared, process-local request pacer defaults to 7 requests per minute; HTTP 429 rate-limit responses are retried with backoff. The comparison script saves each baseline immediately and each full agent report as soon as it completes. Rerunning after an interruption reuses those checkpoints. Responses from runs made with the older, non-checkpointing script cannot be recovered unless previously saved elsewhere. The migrated repository must use **Gemini-only** `reports/sample_comparisons.json` results; archived GPT runs are not same-model evidence. No model results in this archive are fabricated.

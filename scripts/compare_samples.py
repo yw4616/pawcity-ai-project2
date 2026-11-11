@@ -4,7 +4,7 @@ Results are checkpointed after EACH baseline and EACH completed agent answer.
 If a rate limit or connection error interrupts a run, rerun the same command:
 completed results and baseline answers are reused without duplicate API calls.
 
-Requires OPENAI_API_KEY. Run: python scripts/compare_samples.py
+Requires Google Cloud ADC and GOOGLE_CLOUD_PROJECT. Run: uv run python scripts/compare_samples.py
 """
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from pawcity.research_agent import APIModel, PawCityResearch  # noqa: E402
+from pawcity.research_agent import GeminiModel, PawCityResearch  # noqa: E402
 
 SAMPLES = [
     {"id": "run_coverage", "question": "Which NYC ZIP codes have the most documented dog runs?",
@@ -51,7 +51,7 @@ def load_checkpoint(model_name: str) -> list[dict]:
     if data.get("model") != model_name:
         raise RuntimeError(
             "Existing comparison file uses a different model. "
-            "Move reports/sample_comparisons.json aside before changing models."
+            "Archive the GPT checkpoint before starting Gemini comparisons."
         )
     records = data.get("comparisons", [])
     if not isinstance(records, list):
@@ -94,9 +94,9 @@ def update_readme(records: list[dict]) -> None:
 
 
 def main() -> None:
-    if not os.getenv("OPENAI_API_KEY"):
-        raise SystemExit("Set OPENAI_API_KEY securely before running real model comparisons.")
-    model = APIModel()
+    if not os.getenv("GOOGLE_CLOUD_PROJECT"):
+        raise SystemExit("Set GOOGLE_CLOUD_PROJECT and authenticate with Google Cloud ADC first.")
+    model = GeminiModel()
     agent = PawCityResearch(ROOT, llm=model, max_turns=2)
     records = load_checkpoint(model.model)
     by_id = {item["id"]: item for item in records}

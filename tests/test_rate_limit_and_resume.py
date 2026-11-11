@@ -1,7 +1,6 @@
 """Offline tests for model 429 handling and checkpointed comparisons."""
 from __future__ import annotations
 
-import io
 import json
 import os
 import tempfile
@@ -16,45 +15,62 @@ from scripts import compare_samples as cmp
 
 class ModelRetryTests(unittest.TestCase):
     def _model(self):
-        model = object.__new__(ra.APIModel)
-        model.api_key = "fake-unit-test-key"
-        model.api_url = "https://api.example.invalid/v1/responses"
-        model.model = "test-model"
-        return model
+        with patch.dict(os.environ, {"GOOGLE_CLOUD_PROJECT": "offline-test-project"}):
+            return ra.GeminiModel(model="offline-test-model")
 
     def test_429_retries_then_succeeds(self):
-        err = HTTPError(
-            "https://api.example.invalid/v1/responses", 429, "Too Many Requests",
-            {"Retry-After": "0"},
-            io.BytesIO(b'{"error":{"message":"Rate limit. Please try again in 1s."}}'),
-        )
-
-        class GoodResponse:
-            def __enter__(self):
-                return self
-            def __exit__(self, *args):
-                return False
-            def read(self):
-                return json.dumps({"output": [{"content": [
-                    {"type": "output_text", "text": "Success"}
-                ]}]}).encode("utf-8")
-
+        err = HTTPError("https://example.invalid", 429, "Too Many Requests", {}, None)
+        model = self._model()
         with patch.object(ra, "pace_api_request"), patch.object(ra.time, "sleep") as sleep, \
-             patch.object(ra, "urlopen", side_effect=[err, GoodResponse()]) as call:
-            result = self._model().request("Hello")
-            self.assertEqual(result, "Success")
+             patch.object(model, "_generate_once", side_effect=[err, "Success"]) as call:
+            self.assertEqual(model.request("Hello"), "Success")
             self.assertEqual(call.call_count, 2)
             self.assertTrue(sleep.called)
 
-    def test_insufficient_quota_does_not_retry(self):
-        err = HTTPError(
-            "https://api.example.invalid/v1/responses", 429, "No credits", {},
-            io.BytesIO(b'{"error":{"type":"insufficient_quota"}}'),
-        )
-        with patch.object(ra, "pace_api_request"), patch.object(ra, "urlopen", side_effect=err) as call:
-            with self.assertRaisesRegex(RuntimeError, "no remaining credits"):
-                self._model().request("Hello")
+    def test_401_is_not_retried(self):
+        err = HTTPError("https://example.invalid", 401, "Unauthorized", {}, None)
+        model = self._model()
+        with patch.object(ra, "pace_api_request"), \
+             patch.object(model, "_generate_once", side_effect=err) as call:
+            with self.assertRaisesRegex(RuntimeError, "Vertex AI Gemini HTTP 401"):
+                model.request("Hello")
             self.assertEqual(call.call_count, 1)
+
+    def test_no_system_instruction_for_baseline(self):
+        model = self._model()
+        with patch.object(ra, "pace_api_request"), \
+             patch.object(model, "_generate_once", return_value="Response") as call:
+            model.request("Question", instructions=None)
+            call.assert_called_once_with("Question", None)
+
+    def test_vertex_request_payload_and_context(self):
+        model = self._model()
+        class FakeResponse:
+            def __enter__(self): return self
+            def __exit__(self, *_): return False
+            def read(self):
+                return json.dumps({"candidates": [{"content": {"parts": [{"text": "Confirmed"}]}}]}).encode()
+        with patch.object(ra, "google_access_token", return_value="test-access-token"), \
+             patch.object(ra, "urlopen", return_value=FakeResponse()) as urlopen:
+            self.assertEqual(model._generate_once("Q", None), "Confirmed")
+            req = urlopen.call_args.args[0]
+            self.assertIn("offline-test-model", req.full_url)
+            self.assertIn("offline-test-project", req.full_url)
+            self.assertNotIn("systemInstruction", json.loads(req.data))
+            self.assertIn("Authorization", req.headers)
+            self.assertNotIn("OPENAI", str(req.headers))
+
+    def test_vertex_researcher_system_instruction(self):
+        model = self._model()
+        class FakeResponse:
+            def __enter__(self): return self
+            def __exit__(self, *_): return False
+            def read(self):
+                return json.dumps({"candidates": [{"content": {"parts": [{"text": "Confirmed"}]}}]}).encode()
+        with patch.object(ra, "google_access_token", return_value="test-access-token"), \
+             patch.object(ra, "urlopen", return_value=FakeResponse()) as urlopen:
+            model._generate_once("Q", "Independent researcher")
+            self.assertIn("systemInstruction", json.loads(urlopen.call_args.args[0].data))
 
 
 class CheckpointComparisonTests(unittest.TestCase):
@@ -91,10 +107,10 @@ class CheckpointComparisonTests(unittest.TestCase):
                         raise RuntimeError("Simulated API rate limit")
                     return FakeResult()
 
-            with patch.dict(os.environ, {"OPENAI_API_KEY": "fake-unit-test-key"}), \
+            with patch.dict(os.environ, {"GOOGLE_CLOUD_PROJECT": "offline-test-project"}), \
                  patch.object(cmp, "ROOT", root), \
                  patch.object(cmp, "SAMPLES", samples), \
-                 patch.object(cmp, "APIModel", FakeModel), \
+                 patch.object(cmp, "GeminiModel", FakeModel), \
                  patch.object(cmp, "PawCityResearch", FakeAgent):
                 with self.assertRaisesRegex(RuntimeError, "rate limit"):
                     cmp.main()

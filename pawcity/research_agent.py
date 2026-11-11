@@ -1,7 +1,7 @@
 """PawCity Deep Research: Lead -> parallel fresh-context Researchers -> Writer.
 
-The program is LLM-backed only when OPENAI_API_KEY is configured. No simulated
-research findings are ever shown as genuine model outputs. Every data researcher
+Live research uses Google Cloud Vertex AI Gemini through Application Default Credentials.
+No simulated research findings are presented as genuine model outputs. Every data researcher
 reads locally shipped source snapshots using explicit, logged Python tools.
 """
 from __future__ import annotations
@@ -11,12 +11,14 @@ import os
 import re
 import time
 import threading
+import subprocess
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
+from urllib.parse import quote
 
 from pawcity.pipeline import normalize_zip, parse_zip_tags, read_csv
 
@@ -32,7 +34,7 @@ DATA_LIMITS = (
     "summing ZIP counts double-counts such facilities. License periods are not unique dogs and use the 2026 extract; "
     "barking requests and bite incidents are from 2025. Barking data covers ONLY 'Noise, Barking Dog (NR5)' "
     "requests; it is not all dog-related 311 activity. Complaint and bite counts are subject to reporting biases. "
-    "License ZIP indicates the owner's home while incident ZIP indicates the event location. "
+    "License ZIP and incident ZIP fields describe different populations or locations; do not assume equivalent geographic denominators. "
     "These records cannot establish dog safety, causation, per-dog risk, or an overall neighborhood ranking."
 )
 
@@ -154,15 +156,14 @@ class DataTools:
                 "limitations": DATA_LIMITS}
 
 
-# A single process-wide request pacer prevents parallel researcher calls from
-# overwhelming low-tier model API rate limits. Multiple Cloud Run instances
-# still require service-level quotas and may need a shared limiter.
+# A single-process request pacer bounds parallel researcher API call starts.
+# Multiple Cloud Run instances may require Cloud Run concurrency limits.
 _api_pace_lock = threading.Lock()
 _api_next_request_at = 0.0
 
 
 def pace_api_request() -> None:
-    """Limit API starts across threads to PAWCITY_API_RPM (7 by default)."""
+    """Limit Vertex AI request starts across researcher threads (7 RPM by default)."""
     global _api_next_request_at
     rpm = max(1.0, min(1000.0, float(os.getenv("PAWCITY_API_RPM", "7"))))
     interval = 60.0 / rpm
@@ -175,68 +176,114 @@ def pace_api_request() -> None:
         time.sleep(delay)
 
 
-class APIModel:
-    """Stateless OpenAI Responses API calls using Python standard library only."""
-    def __init__(self, model: str | None = None, key: str | None = None):
-        self.api_key = key or os.getenv("OPENAI_API_KEY")
-        if not self.api_key:
-            raise RuntimeError("OPENAI_API_KEY is missing. Set it before using the live research agent.")
-        self.model = model or os.getenv("PAWCITY_MODEL", "gpt-4.1-mini")
-        self.api_url = os.getenv("OPENAI_API_URL", "https://api.openai.com/v1/responses")
+def google_access_token() -> str:
+    """Acquire a short-lived OAuth token, never persist credentials in this repo."""
+    if os.getenv("K_SERVICE"):
+        request = Request(
+            "http://metadata.google.internal/computeMetadata/v1/instance/"
+            "service-accounts/default/token",
+            headers={"Metadata-Flavor": "Google"},
+        )
+        try:
+            with urlopen(request, timeout=5) as result:
+                token_data = json.loads(result.read().decode("utf-8"))
+            return token_data["access_token"]
+        except (URLError, HTTPError, OSError, KeyError, ValueError) as exc:
+            raise RuntimeError(
+                "Cannot obtain Cloud Run service account token from metadata server."
+            ) from exc
+    try:
+        output = subprocess.run(
+            ["gcloud", "auth", "application-default", "print-access-token"],
+            capture_output=True, text=True, timeout=20, check=True,
+        )
+    except (FileNotFoundError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+        raise RuntimeError(
+            "Local Google Cloud credentials unavailable. Install the Google Cloud CLI "
+            "and run: gcloud auth application-default login"
+        ) from exc
+    token = output.stdout.strip()
+    if not token:
+        raise RuntimeError("gcloud returned an empty Google Cloud access token")
+    return token
+
+
+class GeminiModel:
+    """Stateless Vertex AI Gemini via REST and Google Cloud OAuth credentials.
+
+    The local developer authenticates with gcloud Application Default
+    Credentials. Cloud Run uses the attached runtime service identity.
+    No Google API key, JSON key file, or external pip dependency is needed.
+    """
+
+    def __init__(self, model: str | None = None):
+        self.model = model or os.getenv("PAWCITY_MODEL", "gemini-3.5-flash-lite")
+        self.project = os.getenv("GOOGLE_CLOUD_PROJECT") or os.getenv("GCLOUD_PROJECT")
+        self.location = os.getenv("GOOGLE_CLOUD_LOCATION", "global")
+        if not self.project:
+            raise RuntimeError("Set GOOGLE_CLOUD_PROJECT to your school GCP project ID.")
+        if not re.fullmatch(r"[a-z][a-z0-9-]{4,61}[a-z0-9]", self.project):
+            raise ValueError("GOOGLE_CLOUD_PROJECT does not look like a project ID")
+        if not re.fullmatch(r"[a-z][a-z0-9-]*", self.location):
+            raise ValueError("Invalid GOOGLE_CLOUD_LOCATION")
+
+    def _generate_once(self, content: str, instructions: str | None) -> str:
+        project = quote(self.project, safe="")
+        model = quote(self.model, safe="")
+        location = quote(self.location, safe="")
+        host = "aiplatform.googleapis.com" if self.location == "global" else f"{self.location}-aiplatform.googleapis.com"
+        url = (f"https://{host}/v1/projects/{project}/locations/{location}/"
+               f"publishers/google/models/{model}:generateContent")
+        payload = {
+            "contents": [{"role": "user", "parts": [{"text": content}]}],
+            "generationConfig": {"temperature": 0.1},
+        }
+        # IMPORTANT: omit systemInstruction completely for the README baseline.
+        if instructions is not None:
+            payload["systemInstruction"] = {"parts": [{"text": instructions}]}
+        raw = json.dumps(payload).encode("utf-8")
+        req = Request(url, data=raw, headers={
+            "Authorization": "Bearer " + google_access_token(),
+            "Content-Type": "application/json",
+            "X-Goog-User-Project": self.project,
+        }, method="POST")
+        with urlopen(req, timeout=70) as response:
+            result = json.loads(response.read().decode("utf-8"))
+        answers = [part["text"] for candidate in result.get("candidates", [])
+                   for part in candidate.get("content", {}).get("parts", [])
+                   if isinstance(part, dict) and isinstance(part.get("text"), str)
+                   and not part.get("thought")]
+        if not answers:
+            raise RuntimeError("Vertex AI Gemini returned no text (check model permissions or safety filters)")
+        return "\n".join(answers).strip()
 
     def request(self, content: str, instructions: str | None = None) -> str:
-        payload: dict[str, Any] = {"model": self.model, "input": content}
-        if instructions:
-            payload["instructions"] = instructions
-        raw = json.dumps(payload).encode("utf-8")
-
-        for attempt in range(5):
+        for attempt in range(4):
             pace_api_request()
-            request = Request(self.api_url, data=raw, method="POST", headers={
-                "Authorization": f"Bearer {self.api_key}",
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-                "User-Agent": "PawCity-Academic-Research/1.0",
-            })
             try:
-                with urlopen(request, timeout=60) as response:
-                    result = json.loads(response.read().decode("utf-8"))
-                parts = [
-                    part.get("text", "")
-                    for item in result.get("output", [])
-                    for part in item.get("content", [])
-                    if part.get("type") == "output_text"
-                ]
-                if not parts:
-                    raise RuntimeError("Model returned no output_text content")
-                return "\n".join(parts)
-            except HTTPError as err:
-                message = err.read(4096).decode("utf-8", "replace")
-                # Insufficient funds is also HTTP 429 but never fixes itself by waiting.
-                if "insufficient_quota" in message or "credit_balance_exhausted" in message:
-                    raise RuntimeError("Model API has no remaining credits. Check billing.") from err
-                if err.code not in {429, 500, 502, 503, 504} or attempt == 4:
-                    raise RuntimeError(f"Model API failed with HTTP {err.code}: {message}") from err
-                retry_after = 0.0
-                header_value = (err.headers or {}).get("Retry-After", "")
-                try:
-                    retry_after = float(header_value)
-                except (ValueError, TypeError):
-                    match = re.search(r"try again in\s+(\d+(?:\.\d+)?)s", message, re.I)
-                    if match:
-                        retry_after = float(match.group(1))
-                delay = max(retry_after + 1, min(30, 3 * (2 ** attempt)))
-                print(f"Model API HTTP {err.code}; waiting {delay:.0f}s before retry "
-                      f"({attempt + 1}/5).", flush=True)
+                return self._generate_once(content, instructions)
+            except HTTPError as exc:
+                code = exc.code
+                if code not in {429, 500, 502, 503, 504} or attempt == 3:
+                    raise RuntimeError(
+                        f"Vertex AI Gemini HTTP {code}. Check GCP project, model availability, "
+                        "billing, Vertex AI API, and IAM (roles/aiplatform.user)."
+                    ) from exc
+                delay = min(20.0, 3.0 * (2 ** attempt))
+                print(f"Vertex AI HTTP {code}; retry {attempt+1}/3 after {delay:g}s.", flush=True)
                 time.sleep(delay)
-            except (URLError, TimeoutError) as err:
-                if attempt == 4:
-                    raise RuntimeError(f"Model API unavailable: {err}") from err
-                time.sleep(min(30, 3 * (2 ** attempt)))
-        raise RuntimeError("Model request failed")
+            except (URLError, TimeoutError) as exc:
+                if attempt == 3:
+                    raise RuntimeError("Could not reach the Vertex AI Gemini endpoint") from exc
+                time.sleep(min(20.0, 3.0 * (2 ** attempt)))
+        raise RuntimeError("Vertex AI Gemini request could not be completed")
 
     def __call__(self, role: str, instructions: str, content: str) -> str:
         return self.request(content, instructions)
+
+
+# Preserve the old Python import name for existing notebooks.
+APIModel = GeminiModel
 
 
 def json_from_model(text: str) -> dict[str, Any]:
