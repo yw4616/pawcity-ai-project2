@@ -338,8 +338,25 @@ class PawCityResearch:
         plan = json_from_model(self._call("lead", instruction,
                                          {"question": question, "selected_zip_codes": selected_zips,
                                           "selection_basis": selection_basis, "sources": list(DOMAINS)}))
-        if plan.get("clarification"):
+        # An explicit ZIP-specific bite-risk question is well scoped, even if the
+        # available data cannot produce a valid per-dog risk denominator.
+        # Do not mistake an evidence limitation for a location-clarification need.
+        zip_bite_risk = (
+            bool(re.search(r"(?<!\d)\d{5}(?!\d)", question))
+            and "bite" in question.lower()
+            and ("risk" in question.lower() or "rate" in question.lower())
+        )
+        if plan.get("clarification") and not zip_bite_risk:
             return ResearchResult(str(plan["clarification"]), [], [], [{"agent": "lead", "action": "clarification"}], True)
+        if zip_bite_risk:
+            # The Lead may propose an inappropriate clarification or omit the
+            # required evidence source. Enforce relevant parallel research.
+            plan["clarification"] = None
+            plan["domains"] = ["bites", "licenses", "parks"]
+            plan["focus"] = (
+                "Compare documented bite reports and license periods; explain "
+                "why a per-dog bite risk cannot be calculated from these data."
+            )
         domains = [d for d in plan.get("domains", []) if d in SOURCE]
         domains = list(dict.fromkeys(domains))
         for d in DOMAINS:
@@ -407,7 +424,10 @@ class PawCityResearch:
             "Include: Findings, Evidence, Uncertainties and missing data, and a one-sentence conclusion. "
             "Every claim with a number MUST include a bracketed source tag from the given citations "
             "such as [PARKS] or [BARKING_2025]. Never invent values, missing sources, neighborhood "
-            "boundaries, walking distances, rates or causal claims. Explicitly state if the data cannot "
+            "boundaries, walking distances, rates or causal claims. For per-dog bite risk, "
+            "do NOT divide bite reports by license periods: license periods are not unique dogs "
+            "and the population/time denominators are not equivalent. "
+            "Explicitly state if the data cannot "
             "answer the question. The 2025 barking subset is not all 311 dog complaints."),
             {"question": question, "researcher_findings": findings,
              "selection_basis": selection_basis, "limitations": DATA_LIMITS, "allowed_citations": citations})

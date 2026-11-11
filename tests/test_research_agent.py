@@ -98,6 +98,24 @@ class TestResearchAgent(unittest.TestCase):
         self.assertIn('response',result.to_dict())
         self.assertFalse(result.clarification_needed)
 
+    def test_explicit_zip_bite_risk_is_not_misclassified_as_mapping_problem(self):
+        class MisleadingLead(FakeModel):
+            def __call__(self, role, instructions, content):
+                if role == 'lead' and 'checking research coverage' not in instructions:
+                    return json.dumps({
+                        'clarification': 'No inferred neighborhood ZIP mapping is permitted for dog data research.',
+                        'domains': [], 'focus': ''
+                    })
+                return super().__call__(role, instructions, content)
+
+        result = PawCityResearch(self.root, llm=MisleadingLead()).run(
+            'Can you calculate the per-dog bite risk in ZIP 10001 versus 10002?'
+        )
+        self.assertFalse(result.clarification_needed)
+        self.assertTrue(any(t['name'] == 'query_bites' for t in result.tool_calls))
+        self.assertTrue(any(t['name'] == 'query_licenses' for t in result.tool_calls))
+        self.assertTrue(any(t.get('agent') == 'researcher_bites' for t in result.tool_calls))
+
     def test_no_llm_calls_on_vague_query(self):
         fake=FakeModel()
         result=PawCityResearch(self.root, llm=fake).run('good for dogs?')
