@@ -3,7 +3,7 @@
 **Course:** IEOR 4570 — Project 2: A Data Exploration Agent  
 **Path:** Deep Research (`research`)  
 **Audience:** NYC dog owners (especially owners of large/active dogs), urban planners and public-data researchers  
-**Status:** All four real datasets included; offline agent tests and local web endpoints verified. **Live LLM calls and Cloud Run deployment still require credentials/configuration.**
+**Status:** All four real datasets included; offline agent tests and local web endpoints verified. **Live Vertex AI Gemini calls and Cloud Run deployment were verified on November 11, 2026.**
 
 ## 1. What does it do?
 
@@ -181,16 +181,16 @@ The app includes an original custom frontend (research question composer, sugges
 5. Update `submission.json` with the actual URL and **every team member's UNI** (the only UNI known from the conversation is `yw4616`), then run `python validate_submission.py`. One teammate submits the GitHub URL to Courseworks.
 6. If using a private repo, grant access to the four GitHub usernames specified in the assignment.
 
-**This archive does not claim a live Google Cloud deployment.** Replace the blank URL in `submission.json` only after the actual Cloud Run service works. School credits and live model access must be verified in your own GCP project.
+**Google Cloud Run deployment and a live Gemini-powered research response were verified on November 11, 2026.** The deployed Cloud Run URL is recorded in `submission.json`. Live Vertex AI access was verified in the course GCP project.
 
 ## 7. Rubric readiness (25 points)
 
 | Category | Weight | Current status |
 |---|---:|---|
 | Basics | 1 | README and submission.json present; submission URL and any additional authors **still incomplete** |
-| Functionality | 9 | Local site and offline-tested agent integrated; real LLM quality and Cloud Run reachability **unverified** |
+| Functionality | 9 | Local site, offline-tested agent, live Gemini inference, and Cloud Run reachability verified |
 | Data | 4 | Four real datasets and provenance included; known limitations handled; distinct research problem selected |
-| Deep Research path | 7 | Lead, parallel independent Researchers, gap review, clarifications and Writer implemented; live API evaluation **pending** |
+| Deep Research path | 7 | Lead, parallel independent Researchers, gap review, clarification handling, and Writer implemented; live multi-agent API response verified |
 | Creativity | 4 | Custom PawCity website and cross-source dog-owner exploration scenario |
 
 ### Final submission checklist
