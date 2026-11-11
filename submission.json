@@ -1,5 +1,7 @@
 {
-  "deploy_url": "",
-  "authors": ["yw4616"],
+  "deploy_url": "https://pawcity-ai-project2-git-589247151495.us-central1.run.app",
+  "authors": [
+    "yw4616"
+  ],
   "path": "research"
 }
